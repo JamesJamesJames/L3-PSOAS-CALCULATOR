@@ -147,11 +147,13 @@
       color: #fff;
       border-color: var(--accent);
       cursor: pointer;
+      min-height: 44px;
     }
 
     .btn-secondary {
       background: #fff;
       cursor: pointer;
+      min-height: 44px;
     }
 
     .result-item {
@@ -183,6 +185,7 @@
       padding: 6px 10px;
       font-size: 0.95rem;
       margin-top: 10px;
+      transition: background 0.2s, color 0.2s, border-color 0.2s;
     }
 
     .badge.low {
@@ -324,7 +327,7 @@
       </div>
 
       <div class="results-sticky">
-        <div class="card">
+        <div class="card" aria-live="polite" aria-atomic="false">
           <h2>Results</h2>
           <div class="result-item"><span class="result-label">Left area</span><span id="leftArea" class="result-value">—</span></div>
           <div class="result-item"><span class="result-label">Right area</span><span id="rightArea" class="result-value">—</span></div>
@@ -416,11 +419,15 @@
       hintMap[key].classList.toggle('show', show);
     }
 
-    function formatNoDecimal(value, suffix = '') {
-      return `${Math.round(value).toLocaleString()}${suffix}`;
+    function formatNoDecimal(value) {
+      return Math.round(value).toLocaleString();
     }
 
+    // Store last computed values for robust copy text (avoids locale parsing from DOM)
+    let lastComputed = null;
+
     function update() {
+      lastComputed = null;
       const heightVal = parsePositiveNumber(refs.height);
       const leftAPVal = parsePositiveNumber(refs.leftAP);
       const leftTransVal = parsePositiveNumber(refs.leftTrans);
@@ -465,37 +472,47 @@
       refs.heightWarning.classList.toggle('show', heightM < 1.0 || heightM > 2.3);
 
       const sex = refs.sex.value;
+      let classificationText;
       if (sex === 'male') {
         if (index < 545) {
-          refs.classification.textContent = 'Low psoas index (below threshold)';
+          classificationText = 'Low psoas index (below threshold)';
           refs.classification.className = 'badge low';
         } else {
-          refs.classification.textContent = 'Not low (at/above threshold)';
+          classificationText = 'Not low (at/above threshold)';
           refs.classification.className = 'badge not-low';
         }
       } else if (sex === 'female') {
         if (index < 385) {
-          refs.classification.textContent = 'Low psoas index (below threshold)';
+          classificationText = 'Low psoas index (below threshold)';
           refs.classification.className = 'badge low';
         } else {
-          refs.classification.textContent = 'Not low (at/above threshold)';
+          classificationText = 'Not low (at/above threshold)';
           refs.classification.className = 'badge not-low';
         }
       } else {
-        refs.classification.textContent = 'Classification requires sex; thresholds: Male <545, Female <385';
+        classificationText = 'Classification requires sex; thresholds: Male <545, Female <385';
         refs.classification.className = 'badge unknown';
       }
+      refs.classification.textContent = classificationText;
+
+      lastComputed = {
+        leftArea: Math.round(leftArea),
+        rightArea: Math.round(rightArea),
+        totalArea: Math.round(totalArea),
+        index: Math.round(index),
+        classification: classificationText
+      };
     }
 
     async function copyReport() {
-      const canCopy = refs.leftArea.textContent !== '—' && refs.indexValue.textContent !== '—';
-      if (!canCopy) {
+      if (!lastComputed) {
         refs.copyBtn.textContent = 'Enter all values first';
         setTimeout(() => { refs.copyBtn.textContent = 'Copy report sentence'; }, 1200);
         return;
       }
 
-      const sentence = `CT L3 psoas index (Jones method): Left area ${refs.leftArea.textContent.replace(' mm²', '')} mm², Right area ${refs.rightArea.textContent.replace(' mm²', '')} mm², Total ${refs.totalArea.textContent.replace(' mm²', '')} mm²; normalized to height² = ${refs.indexValue.textContent.replace(' mm²/m²', '')} mm²/m². Classification: ${refs.classification.textContent} (thresholds: male <545, female <385 mm²/m²).`;
+      const c = lastComputed;
+      const sentence = `CT L3 psoas index (Jones method): Left area ${c.leftArea} mm², Right area ${c.rightArea} mm², Total ${c.totalArea} mm²; normalized to height² = ${c.index} mm²/m². Classification: ${c.classification} (thresholds: male <545, female <385 mm²/m²).`;
 
       try {
         await navigator.clipboard.writeText(sentence);
@@ -507,6 +524,7 @@
     }
 
     function resetForm() {
+      lastComputed = null;
       refs.sex.value = 'unknown';
       [refs.height, refs.leftAP, refs.leftTrans, refs.rightAP, refs.rightTrans].forEach((input) => {
         input.value = '';
