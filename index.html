@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>L3 Psoas Index (Jones Method) Calculator</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #14213d;
+      --muted: #4b5563;
+      --accent: #005fcc;
+      --accent-soft: #eaf2ff;
+      --danger: #b42318;
+      --danger-soft: #fee4e2;
+      --ok: #027a48;
+      --ok-soft: #ecfdf3;
+      --border: #d0d5dd;
+      --warn: #9a6700;
+      --warn-soft: #fffaeb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.4;
+      font-size: 16px;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.5rem;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .layout {
+      display: grid;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    @media (min-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr 1fr;
+        align-items: start;
+      }
+
+      .results-sticky {
+        position: sticky;
+        top: 16px;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .field small {
+      color: var(--muted);
+    }
+
+    .input-row {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr auto;
+    }
+
+    .unit-inline {
+      min-width: 84px;
+    }
+
+    input[type="number"],
+    select,
+    button {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 1rem;
+      background: #fff;
+      color: var(--text);
+    }
+
+    input[type="number"]:focus,
+    select:focus,
+    button:focus,
+    details:focus-within {
+      outline: 3px solid rgba(0, 95, 204, 0.2);
+      outline-offset: 1px;
+    }
+
+    .hint {
+      display: none;
+      margin-top: 4px;
+      color: var(--danger);
+      font-size: 0.9rem;
+    }
+
+    .hint.show {
+      display: block;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px solid #eef2f6;
+      gap: 8px;
+    }
+
+    .result-item:last-child {
+      border-bottom: 0;
+    }
+
+    .result-label {
+      color: var(--muted);
+    }
+
+    .result-value {
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .badge {
+      display: inline-block;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+
+    .badge.low {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border: 1px solid #fda29b;
+    }
+
+    .badge.not-low {
+      background: var(--ok-soft);
+      color: var(--ok);
+      border: 1px solid #86efac;
+    }
+
+    .badge.unknown {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid #b2ccff;
+    }
+
+    .subtle-warning {
+      display: none;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: var(--warn-soft);
+      color: var(--warn);
+      font-size: 0.9rem;
+      border: 1px solid #fedf89;
+    }
+
+    .subtle-warning.show {
+      display: block;
+    }
+
+    details summary {
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    ul {
+      margin: 10px 0 0 18px;
+      padding: 0;
+    }
+
+    .references p {
+      margin: 6px 0;
+      color: #344054;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header class="card">
+      <h1>L3 Psoas Index (Jones Method) Calculator</h1>
+      <p class="subtitle">Quick CT-based psoas area estimate at L3 with height normalization and sex-specific threshold classification.</p>
+    </header>
+
+    <section class="layout" aria-label="calculator layout">
+      <div class="card">
+        <h2>Inputs</h2>
+
+        <div class="grid">
+          <div class="field">
+            <label for="sex">Sex</label>
+            <select id="sex" aria-describedby="sexHelp">
+              <option value="unknown">Prefer not to say / Unknown</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+            <small id="sexHelp">Used for threshold-based classification only.</small>
+          </div>
+
+          <div class="field">
+            <label for="height">Height</label>
+            <div class="input-row">
+              <input id="height" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g., 170" aria-describedby="heightHint" />
+              <select id="heightUnit" class="unit-inline" aria-label="Height unit">
+                <option value="cm">cm</option>
+                <option value="m">m</option>
+              </select>
+            </div>
+            <div id="heightHint" class="hint">Enter a value greater than 0.</div>
+          </div>
+
+          <div class="field">
+            <label for="leftAP">Left psoas AP diameter</label>
+            <div class="input-row">
+              <input id="leftAP" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g., 40" aria-describedby="leftAPHint" />
+              <select id="leftAPUnit" class="unit-inline" aria-label="Left AP unit">
+                <option value="mm">mm</option>
+                <option value="cm">cm</option>
+              </select>
+            </div>
+            <div id="leftAPHint" class="hint">Enter a value greater than 0.</div>
+          </div>
+
+          <div class="field">
+            <label for="leftTrans">Left psoas transverse diameter</label>
+            <div class="input-row">
+              <input id="leftTrans" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g., 35" aria-describedby="leftTransHint" />
+              <select id="leftTransUnit" class="unit-inline" aria-label="Left transverse unit">
+                <option value="mm">mm</option>
+                <option value="cm">cm</option>
+              </select>
+            </div>
+            <div id="leftTransHint" class="hint">Enter a value greater than 0.</div>
+          </div>
+
+          <div class="field">
+            <label for="rightAP">Right psoas AP diameter</label>
+            <div class="input-row">
+              <input id="rightAP" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g., 42" aria-describedby="rightAPHint" />
+              <select id="rightAPUnit" class="unit-inline" aria-label="Right AP unit">
+                <option value="mm">mm</option>
+                <option value="cm">cm</option>
+              </select>
+            </div>
+            <div id="rightAPHint" class="hint">Enter a value greater than 0.</div>
+          </div>
+
+          <div class="field">
+            <label for="rightTrans">Right psoas transverse diameter</label>
+            <div class="input-row">
+              <input id="rightTrans" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g., 36" aria-describedby="rightTransHint" />
+              <select id="rightTransUnit" class="unit-inline" aria-label="Right transverse unit">
+                <option value="mm">mm</option>
+                <option value="cm">cm</option>
+              </select>
+            </div>
+            <div id="rightTransHint" class="hint">Enter a value greater than 0.</div>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button id="copyBtn" class="btn-primary" type="button">Copy report sentence</button>
+          <button id="resetBtn" class="btn-secondary" type="button">Reset</button>
+        </div>
+      </div>
+
+      <div class="results-sticky">
+        <div class="card">
+          <h2>Results</h2>
+          <div class="result-item"><span class="result-label">Left area</span><span id="leftArea" class="result-value">—</span></div>
+          <div class="result-item"><span class="result-label">Right area</span><span id="rightArea" class="result-value">—</span></div>
+          <div class="result-item"><span class="result-label">Total psoas area (TPA)</span><span id="totalArea" class="result-value">—</span></div>
+          <div class="result-item"><span class="result-label">Height (m)</span><span id="heightM" class="result-value">—</span></div>
+          <div class="result-item"><span class="result-label">Height² (m²)</span><span id="heightSq" class="result-value">—</span></div>
+          <div class="result-item"><span class="result-label">Total Psoas Area Index</span><span id="indexValue" class="result-value">—</span></div>
+          <div id="classification" class="badge unknown">Classification requires complete inputs.</div>
+          <div id="heightWarning" class="subtle-warning">Height appears outside common adult range (&lt;1.0 m or &gt;2.3 m). Please check units.</div>
+        </div>
+
+        <details class="card" style="margin-top: 16px;">
+          <summary>How to measure</summary>
+          <ul>
+            <li>Choose a single axial CT slice at the L3 vertebral level.</li>
+            <li>For each psoas, measure the maximum AP and maximum transverse diameters on that slice.</li>
+            <li>Enter diameters + patient height here.</li>
+          </ul>
+        </details>
+      </div>
+    </section>
+
+    <section class="card references" style="margin-top: 16px;">
+      <h2>References</h2>
+      <p>Jones et al. “Simple psoas cross-sectional area measurement is a quick and easy method to assess sarcopenia and predicts major surgical complications.” Colorectal Disease. 2014.</p>
+      <p>Note: Sex-specific thresholds used: male &lt;545 mm²/m²; female &lt;385 mm²/m² (as cited by Jones et al.).</p>
+    </section>
+  </main>
+
+  <script>
+    const refs = {
+      sex: document.getElementById('sex'),
+      height: document.getElementById('height'),
+      heightUnit: document.getElementById('heightUnit'),
+      leftAP: document.getElementById('leftAP'),
+      leftAPUnit: document.getElementById('leftAPUnit'),
+      leftTrans: document.getElementById('leftTrans'),
+      leftTransUnit: document.getElementById('leftTransUnit'),
+      rightAP: document.getElementById('rightAP'),
+      rightAPUnit: document.getElementById('rightAPUnit'),
+      rightTrans: document.getElementById('rightTrans'),
+      rightTransUnit: document.getElementById('rightTransUnit'),
+      leftArea: document.getElementById('leftArea'),
+      rightArea: document.getElementById('rightArea'),
+      totalArea: document.getElementById('totalArea'),
+      heightM: document.getElementById('heightM'),
+      heightSq: document.getElementById('heightSq'),
+      indexValue: document.getElementById('indexValue'),
+      classification: document.getElementById('classification'),
+      copyBtn: document.getElementById('copyBtn'),
+      resetBtn: document.getElementById('resetBtn'),
+      heightWarning: document.getElementById('heightWarning')
+    };
+
+    const hintMap = {
+      height: document.getElementById('heightHint'),
+      leftAP: document.getElementById('leftAPHint'),
+      leftTrans: document.getElementById('leftTransHint'),
+      rightAP: document.getElementById('rightAPHint'),
+      rightTrans: document.getElementById('rightTransHint')
+    };
+
+    function toMm(value, unit) {
+      return unit === 'cm' ? value * 10 : value;
+    }
+
+    function toMeters(value, unit) {
+      return unit === 'cm' ? value / 100 : value;
+    }
+
+    function parsePositiveNumber(input) {
+      const value = Number(input.value);
+      return Number.isFinite(value) && value > 0 ? value : null;
+    }
+
+    function clearOutputs() {
+      refs.leftArea.textContent = '—';
+      refs.rightArea.textContent = '—';
+      refs.totalArea.textContent = '—';
+      refs.heightM.textContent = '—';
+      refs.heightSq.textContent = '—';
+      refs.indexValue.textContent = '—';
+      refs.classification.textContent = 'Classification requires complete inputs.';
+      refs.classification.className = 'badge unknown';
+      refs.heightWarning.classList.remove('show');
+    }
+
+    function setHintVisibility(key, show) {
+      hintMap[key].classList.toggle('show', show);
+    }
+
+    function formatNoDecimal(value, suffix = '') {
+      return `${Math.round(value).toLocaleString()}${suffix}`;
+    }
+
+    function update() {
+      const heightVal = parsePositiveNumber(refs.height);
+      const leftAPVal = parsePositiveNumber(refs.leftAP);
+      const leftTransVal = parsePositiveNumber(refs.leftTrans);
+      const rightAPVal = parsePositiveNumber(refs.rightAP);
+      const rightTransVal = parsePositiveNumber(refs.rightTrans);
+
+      setHintVisibility('height', refs.height.value !== '' && heightVal === null);
+      setHintVisibility('leftAP', refs.leftAP.value !== '' && leftAPVal === null);
+      setHintVisibility('leftTrans', refs.leftTrans.value !== '' && leftTransVal === null);
+      setHintVisibility('rightAP', refs.rightAP.value !== '' && rightAPVal === null);
+      setHintVisibility('rightTrans', refs.rightTrans.value !== '' && rightTransVal === null);
+
+      if (!heightVal || !leftAPVal || !leftTransVal || !rightAPVal || !rightTransVal) {
+        clearOutputs();
+        return;
+      }
+
+      const heightM = toMeters(heightVal, refs.heightUnit.value);
+      const leftAPmm = toMm(leftAPVal, refs.leftAPUnit.value);
+      const leftTransmm = toMm(leftTransVal, refs.leftTransUnit.value);
+      const rightAPmm = toMm(rightAPVal, refs.rightAPUnit.value);
+      const rightTransmm = toMm(rightTransVal, refs.rightTransUnit.value);
+
+      const leftArea = leftAPmm * leftTransmm;
+      const rightArea = rightAPmm * rightTransmm;
+      const totalArea = leftArea + rightArea;
+      const heightSquared = heightM * heightM;
+      const index = totalArea / heightSquared;
+
+      if (![leftArea, rightArea, totalArea, heightM, heightSquared, index].every(Number.isFinite)) {
+        clearOutputs();
+        return;
+      }
+
+      refs.leftArea.textContent = `${formatNoDecimal(leftArea)} mm²`;
+      refs.rightArea.textContent = `${formatNoDecimal(rightArea)} mm²`;
+      refs.totalArea.textContent = `${formatNoDecimal(totalArea)} mm²`;
+      refs.heightM.textContent = `${heightM.toFixed(3)} m`;
+      refs.heightSq.textContent = `${heightSquared.toFixed(3)} m²`;
+      refs.indexValue.textContent = `${formatNoDecimal(index)} mm²/m²`;
+
+      refs.heightWarning.classList.toggle('show', heightM < 1.0 || heightM > 2.3);
+
+      const sex = refs.sex.value;
+      if (sex === 'male') {
+        if (index < 545) {
+          refs.classification.textContent = 'Low psoas index (below threshold)';
+          refs.classification.className = 'badge low';
+        } else {
+          refs.classification.textContent = 'Not low (at/above threshold)';
+          refs.classification.className = 'badge not-low';
+        }
+      } else if (sex === 'female') {
+        if (index < 385) {
+          refs.classification.textContent = 'Low psoas index (below threshold)';
+          refs.classification.className = 'badge low';
+        } else {
+          refs.classification.textContent = 'Not low (at/above threshold)';
+          refs.classification.className = 'badge not-low';
+        }
+      } else {
+        refs.classification.textContent = 'Classification requires sex; thresholds: Male <545, Female <385';
+        refs.classification.className = 'badge unknown';
+      }
+    }
+
+    async function copyReport() {
+      const canCopy = refs.leftArea.textContent !== '—' && refs.indexValue.textContent !== '—';
+      if (!canCopy) {
+        refs.copyBtn.textContent = 'Enter all values first';
+        setTimeout(() => { refs.copyBtn.textContent = 'Copy report sentence'; }, 1200);
+        return;
+      }
+
+      const sentence = `CT L3 psoas index (Jones method): Left area ${refs.leftArea.textContent.replace(' mm²', '')} mm², Right area ${refs.rightArea.textContent.replace(' mm²', '')} mm², Total ${refs.totalArea.textContent.replace(' mm²', '')} mm²; normalized to height² = ${refs.indexValue.textContent.replace(' mm²/m²', '')} mm²/m². Classification: ${refs.classification.textContent} (thresholds: male <545, female <385 mm²/m²).`;
+
+      try {
+        await navigator.clipboard.writeText(sentence);
+        refs.copyBtn.textContent = 'Copied';
+      } catch (err) {
+        refs.copyBtn.textContent = 'Copy failed';
+      }
+      setTimeout(() => { refs.copyBtn.textContent = 'Copy report sentence'; }, 1200);
+    }
+
+    function resetForm() {
+      refs.sex.value = 'unknown';
+      [refs.height, refs.leftAP, refs.leftTrans, refs.rightAP, refs.rightTrans].forEach((input) => {
+        input.value = '';
+      });
+      refs.heightUnit.value = 'cm';
+      refs.leftAPUnit.value = 'mm';
+      refs.leftTransUnit.value = 'mm';
+      refs.rightAPUnit.value = 'mm';
+      refs.rightTransUnit.value = 'mm';
+
+      Object.values(hintMap).forEach((hint) => hint.classList.remove('show'));
+      clearOutputs();
+    }
+
+    [
+      refs.sex,
+      refs.height,
+      refs.heightUnit,
+      refs.leftAP,
+      refs.leftAPUnit,
+      refs.leftTrans,
+      refs.leftTransUnit,
+      refs.rightAP,
+      refs.rightAPUnit,
+      refs.rightTrans,
+      refs.rightTransUnit
+    ].forEach((el) => {
+      el.addEventListener('input', update);
+      el.addEventListener('change', update);
+    });
+
+    refs.copyBtn.addEventListener('click', copyReport);
+    refs.resetBtn.addEventListener('click', resetForm);
+
+    clearOutputs();
+  </script>
+</body>
+</html>
