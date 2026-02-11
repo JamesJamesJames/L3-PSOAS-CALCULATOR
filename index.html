@@ -235,6 +235,109 @@
       margin: 6px 0;
       color: #344054;
     }
+
+    /* Methodology section */
+    .methodology-intro {
+      margin: 0 0 10px;
+      color: var(--text);
+    }
+
+    .methodology-note {
+      margin: 10px 0 0;
+      padding: 10px 12px;
+      background: var(--accent-soft);
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    /* Evidence section */
+    .evidence-section h2 {
+      margin-bottom: 16px;
+    }
+
+    .evidence-card {
+      border-left: 3px solid var(--accent);
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      background: #f9fafb;
+      border-radius: 0 10px 10px 0;
+    }
+
+    .evidence-card:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .evidence-card h3 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .evidence-citation {
+      margin: 0 0 8px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .evidence-citation a {
+      color: var(--accent);
+      text-decoration: none;
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    .evidence-citation a:hover {
+      text-decoration: underline;
+    }
+
+    .evidence-card ul {
+      margin: 0 0 8px 18px;
+      font-size: 0.93rem;
+      color: #344054;
+    }
+
+    .evidence-card ul li {
+      margin-bottom: 3px;
+    }
+
+    .evidence-relation {
+      margin: 0;
+      font-size: 0.9rem;
+      padding: 8px 10px;
+      background: var(--accent-soft);
+      border-radius: 6px;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    /* Limitations box */
+    .limitations-box {
+      background: #f9fafb;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    }
+
+    .limitations-box h3 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .limitations-box ul {
+      margin: 0 0 0 18px;
+      color: #344054;
+      font-size: 0.93rem;
+    }
+
+    .limitations-box ul li {
+      margin-bottom: 4px;
+    }
   </style>
 </head>
 <body>
@@ -350,10 +453,63 @@
       </div>
     </section>
 
-    <section class="card references" style="margin-top: 16px;">
-      <h2>References</h2>
-      <p>Jones et al. “Simple psoas cross-sectional area measurement is a quick and easy method to assess sarcopenia and predicts major surgical complications.” Colorectal Disease. 2014.</p>
-      <p>Note: Sex-specific thresholds used: male &lt;545 mm²/m²; female &lt;385 mm²/m² (as cited by Jones et al.).</p>
+    <details class="card" style="margin-top: 16px;">
+      <summary>How is this calculated?</summary>
+      <p class="methodology-intro">This calculator implements the simplified psoas measurement method described by Jones et al. (<em>Colorectal Disease</em>, 2014).</p>
+      <p class="methodology-intro"><strong>Steps:</strong></p>
+      <ul>
+        <li>Select a single axial CT slice at the L3 vertebral level.</li>
+        <li>Measure the maximal anteroposterior (AP) and transverse diameters of each psoas muscle.</li>
+        <li>Estimate area for each side as: <strong>AP &times; Transverse</strong>.</li>
+        <li>Sum left and right areas to obtain <strong>Total Psoas Area</strong> (mm&sup2;).</li>
+        <li>Normalize to height&sup2; to generate the <strong>Psoas Index</strong> (mm&sup2;/m&sup2;).</li>
+      </ul>
+      <p class="methodology-note">This is a simplified surrogate for total skeletal muscle area and does not require CT segmentation software.</p>
+    </details>
+
+    <section class="card evidence-section" style="margin-top: 16px;">
+      <h2>Evidence &amp; Source Literature</h2>
+
+      <div class="evidence-card">
+        <h3>Jones et al., 2014</h3>
+        <p class="evidence-citation">Jones KI et al. Simple psoas cross-sectional area measurement is a quick and easy method to assess sarcopenia and predicts major surgical complications. <em>Colorectal Disease.</em> 2014. <a href="https://pubmed.ncbi.nlm.nih.gov/24945972/" target="_blank" rel="noopener noreferrer">PubMed</a></p>
+        <ul>
+          <li>Introduced simplified AP &times; transverse psoas measurement at L3.</li>
+          <li>Used sex-specific cutoffs (&lt;545 male, &lt;385 female mm&sup2;/m&sup2;).</li>
+          <li>Demonstrated association between low psoas index and major postoperative complications in colorectal surgery patients.</li>
+        </ul>
+        <p class="evidence-relation">Relation to this calculator: This calculator directly implements the measurement method described in this paper.</p>
+      </div>
+
+      <div class="evidence-card">
+        <h3>Prado et al., 2008</h3>
+        <p class="evidence-citation">Prado CM et al. Prevalence and clinical implications of sarcopenic obesity in patients with solid tumours. <em>Lancet Oncology.</em> 2008. <a href="https://pubmed.ncbi.nlm.nih.gov/18472026/" target="_blank" rel="noopener noreferrer">PubMed</a></p>
+        <ul>
+          <li>Measured total skeletal muscle area at L3 using CT segmentation.</li>
+          <li>Normalized muscle area to height&sup2; to create Skeletal Muscle Index (SMI).</li>
+          <li>Derived sex-specific sarcopenia thresholds associated with mortality in oncology populations.</li>
+        </ul>
+        <p class="evidence-relation">Relation to this calculator: The sex-specific thresholds applied in Jones trace back conceptually to this CT-based skeletal muscle index literature.</p>
+      </div>
+
+      <div class="evidence-card">
+        <h3>Mourtzakis et al., 2008</h3>
+        <p class="evidence-citation">Mourtzakis M et al. A practical and precise approach to quantification of body composition using CT images acquired during routine care. <em>Appl Physiol Nutr Metab.</em> 2008. <a href="https://pubmed.ncbi.nlm.nih.gov/18923576/" target="_blank" rel="noopener noreferrer">PubMed</a></p>
+        <ul>
+          <li>Validated that skeletal muscle area measured at L3 strongly correlates with whole-body lean mass.</li>
+          <li>Established L3 as an accepted anatomic landmark for CT-based body composition assessment.</li>
+        </ul>
+        <p class="evidence-relation">Relation to this calculator: Provides physiologic validation for using L3 cross-sectional muscle measurements as a proxy for overall muscle mass.</p>
+      </div>
+    </section>
+
+    <section class="limitations-box" style="margin-top: 16px;">
+      <h3>Limitations</h3>
+      <ul>
+        <li>Cutoffs were originally derived from oncology populations.</li>
+        <li>Performance of these thresholds may vary by population (trauma, ICU, EGS).</li>
+        <li>This tool is for clinical assessment support and research use; clinical correlation is required.</li>
+      </ul>
     </section>
   </main>
 
